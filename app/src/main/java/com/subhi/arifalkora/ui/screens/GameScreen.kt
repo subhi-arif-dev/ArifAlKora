@@ -34,8 +34,16 @@ fun GameScreen(
         }
     }
 
+    // مترجم المستويات للعربية
+    val arabicLevelName = when (question.level.lowercase()) {
+        "easy" -> "العادي 🟢"
+        "medium" -> "المتوسط 🟡"
+        "hard" -> "الصعب 🟠"
+        "legendary" -> "الأساطير 🔴"
+        else -> question.level
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. طبقة الخلفية
         Image(
             painter = painterResource(id = R.drawable.main_background),
             contentDescription = null,
@@ -43,49 +51,77 @@ fun GameScreen(
             contentScale = ContentScale.Crop
         )
 
-        // 2. طبقة المحتوى القابل للسحب
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(80.dp)) // مسافة لتفادي الزر
+            Spacer(modifier = Modifier.height(90.dp)) // مسافة لتفادي زر الخروج
             
-            Text(
-                text = "المستوى: ${question.level.uppercase()}",
-                color = GoldAccent, fontSize = 20.sp, fontWeight = FontWeight.Bold
-            )
+            // تصميم جديد لاسم المستوى
+            Surface(
+                color = Color.Black.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, GoldAccent)
+            ) {
+                Text(
+                    text = "المستوى: $arabicLevelName",
+                    color = GoldAccent,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
+            
+            // بطاقة السؤال (أوضح وأجمل بخلفية داكنة وإطار)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = GlassBackground)
+                colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.75f)),
+                border = BorderStroke(1.5.dp, RoyalGreen)
             ) {
                 Text(
-                    text = question.question, color = Color.White, fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(24.dp)
+                    text = question.question, 
+                    color = Color.White, 
+                    fontSize = 24.sp, 
+                    fontWeight = FontWeight.Bold, 
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(24.dp),
+                    lineHeight = 34.sp
                 )
             }
+            
             Spacer(modifier = Modifier.height(32.dp))
 
+            // أزرار الإجابات (تم توضيحها وتكبير الخط)
             question.options.forEachIndexed { index, optionText ->
                 val isCorrectAnswer = index == question.correct_index
                 val isSelected = selectedOptionIndex == index
                 
                 val buttonColor = if (selectedOptionIndex != null) {
-                    if (isCorrectAnswer) RoyalGreen else if (isSelected) ErrorRed else GlassBackground
-                } else GlassBackground
+                    if (isCorrectAnswer) RoyalGreen else if (isSelected) ErrorRed else Color.DarkGray.copy(alpha = 0.9f)
+                } else Color.White.copy(alpha = 0.15f) // زجاجي أوضح قليلاً
 
                 Button(
                     onClick = { if (selectedOptionIndex == null) selectedOptionIndex = index },
-                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor.copy(alpha = 0.8f)),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).height(56.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.4f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .height(60.dp)
                 ) {
-                    Text(text = optionText, color = Color.White, fontSize = 18.sp)
+                    Text(
+                        text = optionText, 
+                        color = Color.White, 
+                        fontSize = 20.sp, 
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
             
@@ -94,12 +130,12 @@ fun GameScreen(
             Spacer(modifier = Modifier.height(40.dp))
         }
 
-        // 3. طبقة زر الرجوع (وضعناه في النهاية ليكون فوق كل شيء ويستجيب للمس)
+        // تم رفع زر الخروج قليلاً لأعلى اليسار ليتناسب بشكل مثالي
         TextButton(
             onClick = onBackClick,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 40.dp, start = 16.dp)
+                .padding(top = 32.dp, start = 8.dp)
         ) {
             Text("🔙 خروج", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
