@@ -35,6 +35,7 @@ fun GameScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // 1. طبقة الخلفية
         Image(
             painter = painterResource(id = R.drawable.main_background),
             contentDescription = null,
@@ -42,25 +43,15 @@ fun GameScreen(
             contentScale = ContentScale.Crop
         )
 
-        // إضافة زر الرجوع في الزاوية العلوية
-        TextButton(
-            onClick = onBackClick,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 48.dp, start = 16.dp)
-        ) {
-            Text("🔙 خروج", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        }
-
-        // --- التعديل السحري هنا: إضافة خاصية السحب (Scroll) للشاشة ---
+        // 2. طبقة المحتوى القابل للسحب
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // هذا السطر يسمح بسحب الشاشة للأعلى والأسفل!
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(100.dp)) // مسافة علوية لتفادي زر الخروج
+            Spacer(modifier = Modifier.height(80.dp)) // مسافة لتفادي الزر
             
             Text(
                 text = "المستوى: ${question.level.uppercase()}",
@@ -100,7 +91,17 @@ fun GameScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             HintCard(hintText = question.hint)
-            Spacer(modifier = Modifier.height(40.dp)) // مسافة إضافية في الأسفل لضمان عدم اختفاء التلميح
+            Spacer(modifier = Modifier.height(40.dp))
+        }
+
+        // 3. طبقة زر الرجوع (وضعناه في النهاية ليكون فوق كل شيء ويستجيب للمس)
+        TextButton(
+            onClick = onBackClick,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 40.dp, start = 16.dp)
+        ) {
+            Text("🔙 خروج", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
