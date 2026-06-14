@@ -28,16 +28,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. طلب صلاحية الإشعارات (لأندرويد 13 فما فوق)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
             }
         }
 
-        // 2. برمجة الإشعارات لتظهر كل يوم (24 ساعة)
         val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.DAYS)
-            .setInitialDelay(1, TimeUnit.DAYS) // يبدأ بعد يوم من فتح التطبيق
+            .setInitialDelay(1, TimeUnit.DAYS)
             .build()
         
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
@@ -46,12 +44,9 @@ class MainActivity : ComponentActivity() {
             workRequest
         )
 
-        // 3. تهيئة المستودع والذاكرة ومدير الأصوات
         val repository = QuestionRepository(this)
         val settingsManager = SettingsManager(this)
         val soundManager = SoundManager(this, settingsManager)
-        
-        // 4. دمجهم جميعاً داخل المدير الفني
         val viewModel = GameViewModel(repository, settingsManager, soundManager)
 
         setContent {
@@ -70,7 +65,6 @@ class MainActivity : ComponentActivity() {
                     val isSoundEnabled by viewModel.isSoundEnabled.collectAsState()
                     val isVibrationEnabled by viewModel.isVibrationEnabled.collectAsState()
 
-                    // خريطة التنقل الخماسية
                     if (showSplash) {
                         SplashScreen(onSplashFinished = { showSplash = false })
                     } else {
@@ -101,7 +95,8 @@ class MainActivity : ComponentActivity() {
                             else -> {
                                 HomeScreen(
                                     onLevelSelected = { fileName -> viewModel.loadLevel(fileName) },
-                                    onSettingsClick = { viewModel.openSettings() }
+                                    onSettingsClick = { viewModel.openSettings() },
+                                    onExitApp = { finish() } // أمر الخروج النهائي من الأكتيفيتي
                                 )
                             }
                         }
