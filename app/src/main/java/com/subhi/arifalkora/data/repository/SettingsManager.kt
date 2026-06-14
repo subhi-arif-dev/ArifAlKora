@@ -4,16 +4,15 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class SettingsManager(context: Context) {
-    // إنشاء ملف ذاكرة صغير ومخفي داخل الهاتف اسمه ArifAlKoraSettings
     private val prefs: SharedPreferences = context.getSharedPreferences("ArifAlKoraSettings", Context.MODE_PRIVATE)
 
-    // مفتاح حفظ حالة الصوت (الافتراضي: مفعل true)
+    // القيمة الافتراضية الآن هي false (مغلق)
     var isSoundEnabled: Boolean
-        get() = prefs.getBoolean("SOUND_ENABLED", true)
+        get() = prefs.getBoolean("SOUND_ENABLED", false)
         set(value) = prefs.edit().putBoolean("SOUND_ENABLED", value).apply()
 
-    // مفتاح حفظ حالة الاهتزاز (الافتراضي: مفعل true)
+    // القيمة الافتراضية الآن هي false (مغلق)
     var isVibrationEnabled: Boolean
-        get() = prefs.getBoolean("VIBRATION_ENABLED", true)
+        get() = prefs.getBoolean("VIBRATION_ENABLED", false)
         set(value) = prefs.edit().putBoolean("VIBRATION_ENABLED", value).apply()
 }
