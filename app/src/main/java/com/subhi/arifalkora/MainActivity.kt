@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                                     onReturnHome = { viewModel.returnHome() }
                                 )
                             }
-                       isGameActive && questions.isNotEmpty() -> {
+                            isGameActive && questions.isNotEmpty() -> {
                                 GameScreen(
                                     question = questions[currentIndex],
                                     onNextQuestion = { isCorrect ->
@@ -67,7 +67,6 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
-
                             else -> {
                                 HomeScreen(
                                     onLevelSelected = { fileName ->
