@@ -3,6 +3,7 @@ package com.subhi.arifalkora.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,9 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.subhi.arifalkora.R
 import com.subhi.arifalkora.ui.theme.*
 
 @Composable
@@ -25,17 +28,28 @@ fun HintCard(hintText: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // زر الـ VAR
+        // زر الـ VAR بعد التعديل لإضافة صورة الصافرة
         Button(
             onClick = { isHintVisible = !isHintVisible },
             colors = ButtonDefaults.buttonColors(containerColor = RoyalGreen),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text(
-                text = if (isHintVisible) "إخفاء التلميح 🙈" else "مساعدة الـ VAR (خصم 5 نقاط) 💡",
-                color = GoldAccent,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // استدعاء أيقونة الصافرة
+                Image(
+                    painter = painterResource(id = R.drawable.icon_hint),
+                    contentDescription = "VAR Hint",
+                    modifier = Modifier.size(24.dp)
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                Text(
+                    text = if (isHintVisible) "إخفاء التلميح 🙈" else "مساعدة الـ VAR (خصم 5 نقاط)",
+                    color = GoldAccent,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
