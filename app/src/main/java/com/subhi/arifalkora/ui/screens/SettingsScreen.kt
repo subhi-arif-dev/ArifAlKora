@@ -2,6 +2,7 @@ package com.subhi.arifalkora.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler // أداة فتح الروابط
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,9 @@ fun SettingsScreen(
     onVibrationToggled: (Boolean) -> Unit,
     onBackClick: () -> Unit
 ) {
+    // استدعاء أداة فتح الروابط من النظام
+    val uriHandler = LocalUriHandler.current
+
     // التقاط ضغطة زر الرجوع في الهاتف وإعادتنا للرئيسية
     BackHandler {
         onBackClick()
@@ -66,11 +71,41 @@ fun SettingsScreen(
                 colors = CardDefaults.cardColors(containerColor = GlassBackground)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
+                    // 1. قسم الإعدادات العامة
                     SettingRow("المؤثرات الصوتية 🎵", isSoundEnabled, onSoundToggled)
                     Spacer(modifier = Modifier.height(16.dp))
                     Divider(color = Color.Gray.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(16.dp))
                     SettingRow("الاهتزاز عند الخطأ 📳", isVibrationEnabled, onVibrationToggled)
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    // 2. القسم القانوني الجديد
+                    Text(
+                        text = "قانوني", 
+                        color = GoldAccent, 
+                        fontSize = 16.sp, 
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Divider(color = Color.Gray.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // زر سياسة الخصوصية القابل للضغط
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                // ضع رابط GitHub Pages الخاص بك هنا (تأكد من تعديل كلمة subhi إذا كان حسابك باسم مختلف)
+                                uriHandler.openUri("https://subhi.github.io/ArifAlKora/privacy_policy.html") 
+                            }
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "سياسة الخصوصية 📄", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "➤", color = Color.LightGray, fontSize = 18.sp)
+                    }
                 }
             }
         }
