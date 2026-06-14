@@ -53,12 +53,15 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     
-    // مكتبات تصميم الواجهات (Jetpack Compose)
+    // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
     
-    // المكتبة السحرية لقراءة ملفات الـ JSON
+    // GSON
     implementation("com.google.code.gson:gson:2.10.1")
+    
+    // مكتبة الإشعارات والمهام الخلفية (WorkManager)
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }
