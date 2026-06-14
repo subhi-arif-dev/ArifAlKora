@@ -14,11 +14,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.subhi.arifalkora.R // استدعاء مجلد الصور الخاص بنا
+import com.subhi.arifalkora.R
 import com.subhi.arifalkora.ui.theme.*
 
 @Composable
-fun HomeScreen(onLevelSelected: (String) -> Unit) {
+fun HomeScreen(onLevelSelected: (String) -> Unit, onSettingsClick: () -> Unit) {
     // 1. حاوية Box الأساسية: تسمح لنا بوضع العناصر فوق بعضها (طبقات)
     Box(modifier = Modifier.fillMaxSize()) {
         
@@ -38,7 +38,7 @@ fun HomeScreen(onLevelSelected: (String) -> Unit) {
                 .align(Alignment.TopEnd) // المحاذاة لأعلى اليمين
                 .padding(24.dp) // إبعادها عن الحافة لتكون مريحة للإصبع
                 .size(36.dp) // حجم احترافي للأيقونات
-                .clickable { /* سنضيف وظيفة فتح الإعدادات لاحقاً */ }
+                .clickable { onSettingsClick() } // تفعيل زر الإعدادات
         )
 
         // 4. طبقة المحتوى الرئيسي (اللوجو + الأزرار)
