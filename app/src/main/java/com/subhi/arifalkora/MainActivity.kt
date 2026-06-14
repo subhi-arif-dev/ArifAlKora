@@ -56,14 +56,18 @@ class MainActivity : ComponentActivity() {
                                     onReturnHome = { viewModel.returnHome() }
                                 )
                             }
-                            isGameActive && questions.isNotEmpty() -> {
+                       isGameActive && questions.isNotEmpty() -> {
                                 GameScreen(
                                     question = questions[currentIndex],
                                     onNextQuestion = { isCorrect ->
                                         viewModel.answerQuestion(isCorrect)
+                                    },
+                                    onBackClick = {
+                                        viewModel.returnHome() // هذا الأمر يعيد اللاعب للرئيسية
                                     }
                                 )
                             }
+
                             else -> {
                                 HomeScreen(
                                     onLevelSelected = { fileName ->
