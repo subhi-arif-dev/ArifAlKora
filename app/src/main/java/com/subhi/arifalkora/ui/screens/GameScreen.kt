@@ -1,5 +1,5 @@
 package com.subhi.arifalkora.ui.screens
-// ... (نفس الـ imports السابقة) ...
+
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
 fun GameScreen(
     question: Question,
     onNextQuestion: (Boolean) -> Unit,
-    onBackClick: () -> Unit // تمت إضافة أمر الرجوع هنا!
+    onBackClick: () -> Unit
 ) {
     var selectedOptionIndex by remember(question.id) { mutableStateOf<Int?>(null) }
 
@@ -42,7 +42,7 @@ fun GameScreen(
             contentScale = ContentScale.Crop
         )
 
-        // 1. إضافة زر الرجوع في الزاوية العلوية
+        // إضافة زر الرجوع في الزاوية العلوية
         TextButton(
             onClick = onBackClick,
             modifier = Modifier
@@ -52,11 +52,15 @@ fun GameScreen(
             Text("🔙 خروج", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
+        // --- التعديل السحري هنا: إضافة خاصية السحب (Scroll) للشاشة ---
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()) // هذا السطر يسمح بسحب الشاشة للأعلى والأسفل!
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(56.dp)) // نزلنا المحتوى قليلاً لترك مساحة لزر الرجوع
+            Spacer(modifier = Modifier.height(100.dp)) // مسافة علوية لتفادي زر الخروج
             
             Text(
                 text = "المستوى: ${question.level.uppercase()}",
@@ -93,9 +97,10 @@ fun GameScreen(
                     Text(text = optionText, color = Color.White, fontSize = 18.sp)
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
+            
+            Spacer(modifier = Modifier.height(24.dp))
             HintCard(hintText = question.hint)
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(40.dp)) // مسافة إضافية في الأسفل لضمان عدم اختفاء التلميح
         }
     }
 }
