@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.subhi.arifalkora.data.repository.QuestionRepository
 import com.subhi.arifalkora.data.repository.SettingsManager
+import com.subhi.arifalkora.data.repository.SoundManager
 import com.subhi.arifalkora.ui.screens.*
 import com.subhi.arifalkora.ui.viewmodel.GameViewModel
 
@@ -21,10 +22,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // تعريف المستودع ومدير الذاكرة وتمريرهما للمدير الفني
+        // 1. تهيئة المستودع والذاكرة ومدير الأصوات
         val repository = QuestionRepository(this)
         val settingsManager = SettingsManager(this)
-        val viewModel = GameViewModel(repository, settingsManager)
+        val soundManager = SoundManager(this, settingsManager)
+        
+        // 2. دمجهم جميعاً داخل المدير الفني
+        val viewModel = GameViewModel(repository, settingsManager, soundManager)
 
         setContent {
             MaterialTheme {
