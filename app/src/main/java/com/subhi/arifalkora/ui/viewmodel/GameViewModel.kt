@@ -9,43 +9,40 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class GameViewModel(private val repository: QuestionRepository) : ViewModel() {
 
-    // قائمة الأسئلة التي سيتم تحميلها
+    // متغير لتحديد ما إذا كان اللاعب في شاشة البداية أم داخل اللعبة
+    private val _isGameActive = MutableStateFlow(false)
+    val isGameActive: StateFlow<Boolean> = _isGameActive.asStateFlow()
+
     private val _questions = MutableStateFlow<List<Question>>(emptyList())
     val questions: StateFlow<List<Question>> = _questions.asStateFlow()
 
-    // مؤشر (رقم) السؤال الحالي
     private val _currentQuestionIndex = MutableStateFlow(0)
     val currentQuestionIndex: StateFlow<Int> = _currentQuestionIndex.asStateFlow()
 
-    // رصيد نقاط اللاعب
     private val _score = MutableStateFlow(0)
     val score: StateFlow<Int> = _score.asStateFlow()
 
-    // دالة لتحميل مستوى معين (مثلاً نمرر لها "easy_questions.json")
+    // بمجرد اختيار المستوى، يتم تحميل الأسئلة ونقل اللاعب للعبة
     fun loadLevel(fileName: String) {
         val loadedQuestions = repository.loadQuestionsByLevel(fileName)
-        _questions.value = loadedQuestions
-        _currentQuestionIndex.value = 0
-        _score.value = 0
+        if (loadedQuestions.isNotEmpty()) {
+            _questions.value = loadedQuestions
+            _currentQuestionIndex.value = 0
+            _score.value = 0
+            _isGameActive.value = true // إعطاء إشارة البدء
+        }
     }
 
-    // دالة للحصول على السؤال الحالي وعرضه على الشاشة
-    fun getCurrentQuestion(): Question? {
-        if (_questions.value.isEmpty()) return null
-        return _questions.value[_currentQuestionIndex.value]
-    }
-
-    // دالة للانتقال للسؤال التالي وحساب النقاط
     fun answerQuestion(isCorrect: Boolean) {
         if (isCorrect) {
-            _score.value += 10 // إضافة 10 نقاط إذا كانت الإجابة صحيحة
+            _score.value += 10
         }
         
-        // إذا لم نصل لنهاية الأسئلة، انتقل للسؤال التالي
         if (_currentQuestionIndex.value < _questions.value.size - 1) {
             _currentQuestionIndex.value += 1
         } else {
-            // هنا يمكننا لاحقاً إضافة حالة لإنهاء اللعبة وإظهار النتيجة النهائية
+            // مؤقتاً: عند انتهاء الأسئلة، نعيده للشاشة الرئيسية
+            _isGameActive.value = false 
         }
     }
 }
