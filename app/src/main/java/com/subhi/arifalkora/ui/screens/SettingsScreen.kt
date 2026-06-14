@@ -97,7 +97,7 @@ fun SettingsScreen(
                             .fillMaxWidth()
                             .clickable {
                                 // ضع رابط GitHub Pages الخاص بك هنا (تأكد من تعديل كلمة subhi إذا كان حسابك باسم مختلف)
-                                uriHandler.openUri("https://subhi.github.io/ArifAlKora/privacy_policy.html") 
+                                uriHandler.openUri("https://subhi-arif-dev.github.io/ArifAlKora/privacy_policy.html") 
                             }
                             .padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
