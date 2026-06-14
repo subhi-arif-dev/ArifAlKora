@@ -1,9 +1,7 @@
 name: Build Android APK
 
 on:
-  push:
-    branches: [ "main" ] # سيعمل المصنع تلقائياً عند أي تعديل قادم
-  workflow_dispatch: # زر تشغيل يدوي
+  workflow_dispatch: # هذا الأمر يجعل البناء يدوياً بالكامل (يظهر لك زر للتشغيل)
 
 jobs:
   build:
