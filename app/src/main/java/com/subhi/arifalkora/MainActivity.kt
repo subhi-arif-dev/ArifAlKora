@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.subhi.arifalkora.data.repository.QuestionRepository
 import com.subhi.arifalkora.ui.screens.GameScreen
 import com.subhi.arifalkora.ui.screens.HomeScreen
+import com.subhi.arifalkora.ui.screens.ResultScreen
 import com.subhi.arifalkora.ui.viewmodel.GameViewModel
 
 class MainActivity : ComponentActivity() {
@@ -28,24 +29,38 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val isGameActive by viewModel.isGameActive.collectAsState()
+                    val isGameOver by viewModel.isGameOver.collectAsState()
                     val questions by viewModel.questions.collectAsState()
                     val currentIndex by viewModel.currentQuestionIndex.collectAsState()
+                    val score by viewModel.score.collectAsState()
 
-                    // هندسة التنقل بين الشاشات
-                    if (!isGameActive) {
-                        // إذا اللعبة غير نشطة -> اعرض شاشة المستويات
-                        HomeScreen(
-                            onLevelSelected = { fileName ->
-                                viewModel.loadLevel(fileName)
-                            }
-                        )
-                    } else {
-                        // إذا اللعبة نشطة وتم تحميل الأسئلة -> اعرض اللعبة
-                        if (questions.isNotEmpty()) {
+                    // هندسة التنقل الثلاثية
+                    when {
+                        // 1. إذا اللعبة انتهت، اعرض شاشة النتيجة
+                        isGameOver -> {
+                            ResultScreen(
+                                score = score,
+                                totalQuestions = questions.size,
+                                onPlayAgain = { viewModel.replayLevel() },
+                                onReturnHome = { viewModel.returnHome() }
+                            )
+                        }
+                        
+                        // 2. إذا اللعبة نشطة، اعرض شاشة اللعب
+                        isGameActive && questions.isNotEmpty() -> {
                             GameScreen(
                                 question = questions[currentIndex],
                                 onNextQuestion = { isCorrect ->
                                     viewModel.answerQuestion(isCorrect)
+                                }
+                            )
+                        }
+                        
+                        // 3. خلاف ذلك، اعرض الشاشة الرئيسية
+                        else -> {
+                            HomeScreen(
+                                onLevelSelected = { fileName ->
+                                    viewModel.loadLevel(fileName)
                                 }
                             )
                         }
