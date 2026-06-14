@@ -4,13 +4,15 @@ import androidx.lifecycle.ViewModel
 import com.subhi.arifalkora.data.model.Question
 import com.subhi.arifalkora.data.repository.QuestionRepository
 import com.subhi.arifalkora.data.repository.SettingsManager
+import com.subhi.arifalkora.data.repository.SoundManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class GameViewModel(
     private val repository: QuestionRepository,
-    private val settingsManager: SettingsManager
+    private val settingsManager: SettingsManager,
+    private val soundManager: SoundManager // أضفنا مدير الأصوات هنا
 ) : ViewModel() {
 
     private val _isGameActive = MutableStateFlow(false)
@@ -55,12 +57,21 @@ class GameViewModel(
     }
 
     fun answerQuestion(isCorrect: Boolean) {
-        if (isCorrect) _score.value += 10
+        // تشغيل الصوت والاهتزاز بناءً على الإجابة
+        if (isCorrect) {
+            _score.value += 10
+            soundManager.playCorrectSound()
+        } else {
+            soundManager.playWrongSound()
+        }
+        
+        // الانتقال للسؤال التالي أو إنهاء اللعبة
         if (_currentQuestionIndex.value < _questions.value.size - 1) {
             _currentQuestionIndex.value += 1
         } else {
             _isGameActive.value = false
             _isGameOver.value = true
+            soundManager.playWinSound() // تشغيل صوت الاحتفال عند ظهور النتيجة
         }
     }
 
