@@ -1,5 +1,6 @@
 package com.subhi.arifalkora
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,22 +13,45 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.subhi.arifalkora.data.repository.NotificationWorker
 import com.subhi.arifalkora.data.repository.QuestionRepository
 import com.subhi.arifalkora.data.repository.SettingsManager
 import com.subhi.arifalkora.data.repository.SoundManager
 import com.subhi.arifalkora.ui.screens.*
 import com.subhi.arifalkora.ui.viewmodel.GameViewModel
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. تهيئة المستودع والذاكرة ومدير الأصوات
+        // 1. طلب صلاحية الإشعارات (لأندرويد 13 فما فوق)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
+            }
+        }
+
+        // 2. برمجة الإشعارات لتظهر كل يوم (24 ساعة)
+        val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.DAYS)
+            .setInitialDelay(1, TimeUnit.DAYS) // يبدأ بعد يوم من فتح التطبيق
+            .build()
+        
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "DailyFootballNotification",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+
+        // 3. تهيئة المستودع والذاكرة ومدير الأصوات
         val repository = QuestionRepository(this)
         val settingsManager = SettingsManager(this)
         val soundManager = SoundManager(this, settingsManager)
         
-        // 2. دمجهم جميعاً داخل المدير الفني
+        // 4. دمجهم جميعاً داخل المدير الفني
         val viewModel = GameViewModel(repository, settingsManager, soundManager)
 
         setContent {
