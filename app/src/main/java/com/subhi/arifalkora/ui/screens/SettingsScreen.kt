@@ -1,5 +1,6 @@
 package com.subhi.arifalkora.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,8 +25,12 @@ fun SettingsScreen(
     onVibrationToggled: (Boolean) -> Unit,
     onBackClick: () -> Unit
 ) {
+    // التقاط ضغطة زر الرجوع في الهاتف وإعادتنا للرئيسية
+    BackHandler {
+        onBackClick()
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // خلفية الملعب
         Image(
             painter = painterResource(id = R.drawable.main_background),
             contentDescription = "Background",
@@ -33,7 +38,6 @@ fun SettingsScreen(
             contentScale = ContentScale.Crop
         )
 
-        // زر الرجوع
         TextButton(
             onClick = onBackClick,
             modifier = Modifier.align(Alignment.TopStart).padding(top = 48.dp, start = 16.dp)
@@ -56,7 +60,6 @@ fun SettingsScreen(
             
             Spacer(modifier = Modifier.height(48.dp))
 
-            // بطاقة الخيارات الزجاجية
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -74,7 +77,6 @@ fun SettingsScreen(
     }
 }
 
-// دالة مخصصة لتصميم صف الإعداد (نص + مفتاح تشغيل)
 @Composable
 fun SettingRow(title: String, isChecked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
