@@ -3,11 +3,13 @@
     package="com.subhi.arifalkora">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- طلب صلاحية إرسال الإشعارات -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_logo"
-        android:label="عارف الكورة" 
+        android:label="عارف الكورة"
         android:roundIcon="@drawable/app_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.ArifAlKora">
