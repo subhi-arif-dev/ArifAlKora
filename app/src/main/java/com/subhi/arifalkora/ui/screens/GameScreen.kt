@@ -15,11 +15,25 @@ import androidx.compose.ui.unit.sp
 import com.subhi.arifalkora.data.model.Question
 import com.subhi.arifalkora.ui.theme.*
 import com.subhi.arifalkora.ui.components.HintCard
+import kotlinx.coroutines.delay
 
 @Composable
-fun GameScreen(question: Question) {
-    // متغير لتخزين إجابة اللاعب (لتحديد ما إذا كان قد أجاب أم لا)
-    var selectedOptionIndex by remember { mutableStateOf<Int?>(null) }
+fun GameScreen(
+    question: Question,
+    onNextQuestion: (Boolean) -> Unit // دالة نمررها للانتقال للسؤال التالي بعد الإجابة
+) {
+    // استخدمنا (question.id) لكي يتم تصفير الخيار عند الانتقال لسؤال جديد
+    var selectedOptionIndex by remember(question.id) { mutableStateOf<Int?>(null) }
+
+    // هذا الـ Effect ينتظر ثانيتين بعد إجابة اللاعب ثم يرسل الأمر بالانتقال للسؤال التالي
+    LaunchedEffect(selectedOptionIndex) {
+        if (selectedOptionIndex != null) {
+            val isCorrect = selectedOptionIndex == question.correct_index
+            // ملاحظة السينيور: هنا سنضع كود تشغيل الصوت لاحقاً!
+            delay(2000) // انتظار ثانيتين لكي يرى اللاعب الإجابة الصحيحة
+            onNextQuestion(isCorrect)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -28,7 +42,6 @@ fun GameScreen(question: Question) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 1. رأس الشاشة (مستوى الصعوبة)
         Text(
             text = "المستوى: ${question.level.uppercase()}",
             color = GoldAccent,
@@ -38,7 +51,6 @@ fun GameScreen(question: Question) {
         
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 2. بطاقة السؤال (تصميم زجاجي)
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -56,25 +68,23 @@ fun GameScreen(question: Question) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 3. أزرار الخيارات الـ 4
         question.options.forEachIndexed { index, optionText ->
+            val isCorrectAnswer = index == question.correct_index
             val isSelected = selectedOptionIndex == index
-            val isCorrect = index == question.correct_index
             
-            // تحديد لون الزر بذكاء بعد إجابة المستخدم
+            // هندسة الألوان كما طلبت بالضبط:
             val buttonColor = if (selectedOptionIndex != null) {
                 when {
-                    isCorrect -> RoyalGreen // الإجابة الصحيحة تضيء بالأخضر دائماً
-                    isSelected && !isCorrect -> ErrorRed // إجابة المستخدم الخاطئة تضيء بالأحمر
+                    isCorrectAnswer -> RoyalGreen // الإجابة الصحيحة تضيء بالأخضر دائماً سواء اختارها أم لا
+                    isSelected && !isCorrectAnswer -> ErrorRed // إذا اختار إجابة خاطئة تضيء بالأحمر
                     else -> GlassBackground // باقي الأزرار تبقى شفافة
                 }
             } else {
-                GlassBackground // قبل الإجابة، كل الأزرار شفافة
+                GlassBackground // قبل الإجابة كل الأزرار شفافة
             }
 
             Button(
                 onClick = { 
-                    // يمنع اللاعب من تغيير إجابته بعد الضغط!
                     if (selectedOptionIndex == null) { 
                         selectedOptionIndex = index 
                     }
@@ -94,9 +104,7 @@ fun GameScreen(question: Question) {
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f)) // لدفع زر التلميح لأسفل الشاشة
-
-        // 4. استدعاء زر مساعدة الـ VAR (التلميح المخفي)
+        Spacer(modifier = Modifier.weight(1f))
         HintCard(hintText = question.hint)
     }
 }
