@@ -8,11 +8,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.subhi.arifalkora.data.repository.QuestionRepository
 import com.subhi.arifalkora.ui.screens.GameScreen
 import com.subhi.arifalkora.ui.screens.HomeScreen
 import com.subhi.arifalkora.ui.screens.ResultScreen
+import com.subhi.arifalkora.ui.screens.SplashScreen
 import com.subhi.arifalkora.ui.viewmodel.GameViewModel
 
 class MainActivity : ComponentActivity() {
@@ -28,41 +32,45 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    // متغير لتتبع هل نحن في شاشة البداية أم انتهت؟
+                    var showSplash by remember { mutableStateOf(true) }
+
                     val isGameActive by viewModel.isGameActive.collectAsState()
                     val isGameOver by viewModel.isGameOver.collectAsState()
                     val questions by viewModel.questions.collectAsState()
                     val currentIndex by viewModel.currentQuestionIndex.collectAsState()
                     val score by viewModel.score.collectAsState()
 
-                    // هندسة التنقل الثلاثية
-                    when {
-                        // 1. إذا اللعبة انتهت، اعرض شاشة النتيجة
-                        isGameOver -> {
-                            ResultScreen(
-                                score = score,
-                                totalQuestions = questions.size,
-                                onPlayAgain = { viewModel.replayLevel() },
-                                onReturnHome = { viewModel.returnHome() }
-                            )
-                        }
-                        
-                        // 2. إذا اللعبة نشطة، اعرض شاشة اللعب
-                        isGameActive && questions.isNotEmpty() -> {
-                            GameScreen(
-                                question = questions[currentIndex],
-                                onNextQuestion = { isCorrect ->
-                                    viewModel.answerQuestion(isCorrect)
-                                }
-                            )
-                        }
-                        
-                        // 3. خلاف ذلك، اعرض الشاشة الرئيسية
-                        else -> {
-                            HomeScreen(
-                                onLevelSelected = { fileName ->
-                                    viewModel.loadLevel(fileName)
-                                }
-                            )
+                    // هندسة التنقل الرباعية (Splash -> Home -> Game -> Result)
+                    if (showSplash) {
+                        SplashScreen(
+                            onSplashFinished = { showSplash = false }
+                        )
+                    } else {
+                        when {
+                            isGameOver -> {
+                                ResultScreen(
+                                    score = score,
+                                    totalQuestions = questions.size,
+                                    onPlayAgain = { viewModel.replayLevel() },
+                                    onReturnHome = { viewModel.returnHome() }
+                                )
+                            }
+                            isGameActive && questions.isNotEmpty() -> {
+                                GameScreen(
+                                    question = questions[currentIndex],
+                                    onNextQuestion = { isCorrect ->
+                                        viewModel.answerQuestion(isCorrect)
+                                    }
+                                )
+                            }
+                            else -> {
+                                HomeScreen(
+                                    onLevelSelected = { fileName ->
+                                        viewModel.loadLevel(fileName)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
