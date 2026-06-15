@@ -22,8 +22,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun GameScreen(
     question: Question,
-    onNextQuestion: (Boolean) -> Unit,
-    onHintUsed: () -> Unit, // إضافة أمر التلميح
+    onAnswerSelected: (Boolean) -> Unit, // دالة الصوت الفوري
+    onNextQuestion: () -> Unit,          // دالة الانتقال
+    onHintUsed: () -> Unit,
     onBackClick: () -> Unit
 ) {
     var selectedOptionIndex by remember(question.id) { mutableStateOf<Int?>(null) }
@@ -36,8 +37,9 @@ fun GameScreen(
     LaunchedEffect(selectedOptionIndex) {
         if (selectedOptionIndex != null) {
             val isCorrect = selectedOptionIndex == question.correct_index
-            delay(2000)
-            onNextQuestion(isCorrect)
+            onAnswerSelected(isCorrect) // 1. تشغيل الصوت ورفع النقاط فوراً
+            delay(2000)                 // 2. انتظار ثانيتين للمشاهدة
+            onNextQuestion()            // 3. الانتقال للسؤال التالي
         }
     }
 
@@ -116,7 +118,6 @@ fun GameScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // الـ key يضمن إعادة بناء زر التلميح مع كل سؤال جديد لكي يختفي وتعود حالته للأصل
             key(question.id) {
                 HintCard(
                     hintText = question.hint,
