@@ -3,7 +3,6 @@
     package="com.subhi.arifalkora">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- طلب صلاحية إرسال الإشعارات -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -14,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ArifAlKora">
         
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
