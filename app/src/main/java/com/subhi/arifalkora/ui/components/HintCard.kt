@@ -20,22 +20,27 @@ import com.subhi.arifalkora.R
 import com.subhi.arifalkora.ui.theme.*
 
 @Composable
-fun HintCard(hintText: String) {
-    // المتغير المسؤول عن إخفاء وإظهار التلميح (الزر السري)
+fun HintCard(hintText: String, onHintClick: () -> Unit) {
     var isHintVisible by remember { mutableStateOf(false) }
+    var isPointDeducted by remember { mutableStateOf(false) } // لمنع الخصم مرتين لنفس السؤال
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // زر الـ VAR بعد التعديل لإضافة صورة الصافرة
         Button(
-            onClick = { isHintVisible = !isHintVisible },
+            onClick = { 
+                isHintVisible = !isHintVisible 
+                // خصم النقاط مرة واحدة فقط عند إظهار التلميح لأول مرة
+                if (isHintVisible && !isPointDeducted) {
+                    onHintClick()
+                    isPointDeducted = true
+                }
+            },
             colors = ButtonDefaults.buttonColors(containerColor = RoyalGreen),
             shape = RoundedCornerShape(8.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // استدعاء أيقونة الصافرة
                 Image(
                     painter = painterResource(id = R.drawable.icon_hint),
                     contentDescription = "VAR Hint",
@@ -54,7 +59,6 @@ fun HintCard(hintText: String) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // الأنيميشن الملوكي لظهور التلميح
         AnimatedVisibility(
             visible = isHintVisible,
             enter = fadeIn(),
