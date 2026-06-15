@@ -107,7 +107,8 @@ class MainActivity : ComponentActivity() {
                                     isGameActive && questions.isNotEmpty() -> {
                                         GameScreen(
                                             question = questions[currentIndex],
-                                            onNextQuestion = { isCorrect -> viewModel.answerQuestion(isCorrect) },
+                                            onAnswerSelected = { isCorrect -> viewModel.processAnswer(isCorrect) },
+                                            onNextQuestion = { viewModel.moveToNextQuestion() },
                                             onHintUsed = { viewModel.useHint() },
                                             onBackClick = { viewModel.returnHome() }
                                         )
