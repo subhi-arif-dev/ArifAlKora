@@ -1,7 +1,7 @@
-name: Build Android APK
+name: Build Release Android App
 
 on:
-  workflow_dispatch: # هذا الأمر يجعل البناء يدوياً بالكامل (يظهر لك زر للتشغيل)
+  workflow_dispatch: # يتيح لك تشغيل البناء يدوياً بضغطة زر
 
 jobs:
   build:
@@ -19,14 +19,29 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: '8.4'
 
-    - name: Build APK
-      run: gradle assembleDebug --no-daemon
+    - name: Make gradlew executable
+      run: chmod +x gradlew
 
-    - name: Upload APK
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/arifalkora.jks
+
+    - name: Build Release APK & AAB
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: ./gradlew assembleRelease bundleRelease --no-daemon
+
+    - name: Upload Release APK (للتجربة على هاتفك)
       uses: actions/upload-artifact@v4
       with:
-        name: ArifAlKora-App
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: ArifAlKora-Release-APK
+        path: app/build/outputs/apk/release/app-release.apk
+
+    - name: Upload Release AAB (للرفع على جوجل بلاي)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ArifAlKora-Release-AAB
+        path: app/build/outputs/bundle/release/app-release.aab
