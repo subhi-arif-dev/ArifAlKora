@@ -42,10 +42,48 @@ class GameViewModel(
     private var currentLevelFileName: String = ""
 
     fun loadLevel(fileName: String) {
-        val loadedQuestions = repository.loadQuestionsByLevel(fileName)
-        if (loadedQuestions.isNotEmpty()) {
+        // استخراج اسم المستوى من اسم الملف (مثلاً: "easy_questions.json" يصبح "easy")
+        val levelName = fileName.replace("_questions.json", "")
+        
+        val allQuestions = repository.loadQuestionsByLevel(fileName)
+        
+        if (allQuestions.isNotEmpty()) {
             currentLevelFileName = fileName
-            _questions.value = loadedQuestions
+            
+            // 1. قراءة ذاكرة الأسئلة الملعوبة مسبقاً
+            var playedIds = settingsManager.getPlayedQuestions(levelName)
+            
+            // 2. تصفية الأسئلة (نستبعد ما تم لعبه)
+            var availableQuestions = allQuestions.filter { !playedIds.contains(it.id.toString()) }
+            
+            // 3. إذا كانت الأسئلة المتبقية أقل من 10 (اللاعب أنهى المستوى)، نمسح الذاكرة ونبدأ من جديد
+            if (availableQuestions.size < 10) {
+                settingsManager.resetPlayedQuestions(levelName)
+                playedIds = emptySet()
+                availableQuestions = allQuestions
+            }
+            
+            // 4. خلط الأسئلة المتبقية واختيار 10 أسئلة بشكل عشوائي
+            val selectedQuestions = availableQuestions.shuffled().take(10)
+            
+            // 5. حفظ هذه الـ 10 أسئلة في الذاكرة لكي لا تظهر في الجولات القادمة
+            val selectedIds = selectedQuestions.map { it.id.toString() }.toSet()
+            settingsManager.savePlayedQuestions(levelName, selectedIds)
+            
+            // 6. الخلط العميق: خلط ترتيب الخيارات (الأجوبة) داخل كل سؤال وتحديث مؤشر الإجابة الصحيحة
+            val finalQuestions = selectedQuestions.map { question ->
+                // نحفظ النص الخاص بالإجابة الصحيحة
+                val correctAnswerText = question.options[question.correct_index]
+                // نخلط الخيارات عشوائياً
+                val shuffledOptions = question.options.shuffled()
+                // نبحث عن مكان الإجابة الصحيحة الجديد بعد الخلط
+                val newCorrectIndex = shuffledOptions.indexOf(correctAnswerText)
+                
+                // نحدث السؤال بالخيارات الجديدة والمكان الجديد للإجابة
+                question.copy(options = shuffledOptions, correct_index = newCorrectIndex)
+            }
+            
+            _questions.value = finalQuestions
             _currentQuestionIndex.value = 0
             _score.value = 0
             _isGameActive.value = true
@@ -71,7 +109,6 @@ class GameViewModel(
         }
     }
 
-    // الدالة الجديدة لخصم النقاط عند استخدام التلميح
     fun useHint() {
         val newScore = _score.value - 5
         _score.value = if (newScore > 0) newScore else 0
