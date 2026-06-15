@@ -9,14 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -55,12 +54,22 @@ class MainActivity : ComponentActivity() {
         val repository = QuestionRepository(this)
         val settingsManager = SettingsManager(this)
         val soundManager = SoundManager(this, settingsManager)
-        val viewModel = GameViewModel(repository, settingsManager, soundManager)
 
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     var showSplash by remember { mutableStateOf(true) }
+
+                    // الطريقة الاحترافية والآمنة لإنشاء ViewModel
+                    val factory = remember {
+                        object : ViewModelProvider.Factory {
+                            @Suppress("UNCHECKED_CAST")
+                            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                                return GameViewModel(repository, settingsManager, soundManager) as T
+                            }
+                        }
+                    }
+                    val viewModel: GameViewModel = viewModel(factory = factory)
 
                     val isGameActive by viewModel.isGameActive.collectAsState()
                     val isGameOver by viewModel.isGameOver.collectAsState()
@@ -77,7 +86,6 @@ class MainActivity : ComponentActivity() {
                         SplashScreen(onSplashFinished = { showSplash = false })
                     } else {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            
                             Box(modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
                                 when {
                                     isSettingsActive -> {
@@ -100,7 +108,7 @@ class MainActivity : ComponentActivity() {
                                         GameScreen(
                                             question = questions[currentIndex],
                                             onNextQuestion = { isCorrect -> viewModel.answerQuestion(isCorrect) },
-                                            onHintUsed = { viewModel.useHint() }, // تفعيل الخصم هنا
+                                            onHintUsed = { viewModel.useHint() },
                                             onBackClick = { viewModel.returnHome() }
                                         )
                                     }
@@ -113,7 +121,6 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-
                             BannerAd(modifier = Modifier.align(Alignment.BottomCenter))
                         }
                     }
