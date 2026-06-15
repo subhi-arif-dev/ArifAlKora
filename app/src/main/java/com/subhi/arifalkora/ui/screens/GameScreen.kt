@@ -23,12 +23,12 @@ import kotlinx.coroutines.delay
 fun GameScreen(
     question: Question,
     onNextQuestion: (Boolean) -> Unit,
+    onHintUsed: () -> Unit, // إضافة أمر التلميح
     onBackClick: () -> Unit
 ) {
     var selectedOptionIndex by remember(question.id) { mutableStateOf<Int?>(null) }
-    var showExitDialog by remember { mutableStateOf(false) } // متغير لإظهار رسالة التأكيد
+    var showExitDialog by remember { mutableStateOf(false) }
 
-    // التقاط ضغطة زر الهاتف وإظهار الرسالة
     BackHandler {
         showExitDialog = true
     }
@@ -115,11 +115,18 @@ fun GameScreen(
             }
             
             Spacer(modifier = Modifier.height(24.dp))
-            HintCard(hintText = question.hint)
+            
+            // الـ key يضمن إعادة بناء زر التلميح مع كل سؤال جديد لكي يختفي وتعود حالته للأصل
+            key(question.id) {
+                HintCard(
+                    hintText = question.hint,
+                    onHintClick = onHintUsed
+                )
+            }
+            
             Spacer(modifier = Modifier.height(40.dp))
         }
 
-        // زر الخروج العلوي يظهر الرسالة أيضاً بدلاً من الخروج المباشر
         TextButton(
             onClick = { showExitDialog = true },
             modifier = Modifier.align(Alignment.TopStart).padding(top = 32.dp, start = 8.dp)
@@ -127,7 +134,6 @@ fun GameScreen(
             Text("🔙 خروج", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
-        // تصميم رسالة التأكيد
         if (showExitDialog) {
             AlertDialog(
                 onDismissRequest = { showExitDialog = false },
@@ -140,7 +146,7 @@ fun GameScreen(
                     Button(
                         onClick = {
                             showExitDialog = false
-                            onBackClick() // العودة للرئيسية
+                            onBackClick()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
                     ) {
