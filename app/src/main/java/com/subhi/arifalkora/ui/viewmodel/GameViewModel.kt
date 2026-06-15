@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class GameViewModel(
     private val repository: QuestionRepository,
     private val settingsManager: SettingsManager,
-    private val soundManager: SoundManager // أضفنا مدير الأصوات هنا
+    private val soundManager: SoundManager
 ) : ViewModel() {
 
     private val _isGameActive = MutableStateFlow(false)
@@ -21,11 +21,9 @@ class GameViewModel(
     private val _isGameOver = MutableStateFlow(false)
     val isGameOver: StateFlow<Boolean> = _isGameOver.asStateFlow()
 
-    // حالة شاشة الإعدادات
     private val _isSettingsActive = MutableStateFlow(false)
     val isSettingsActive: StateFlow<Boolean> = _isSettingsActive.asStateFlow()
 
-    // متغيرات الصوت والاهتزاز تسحب قيمتها الأولية من الذاكرة
     private val _isSoundEnabled = MutableStateFlow(settingsManager.isSoundEnabled)
     val isSoundEnabled: StateFlow<Boolean> = _isSoundEnabled.asStateFlow()
 
@@ -52,12 +50,11 @@ class GameViewModel(
             _score.value = 0
             _isGameActive.value = true
             _isGameOver.value = false
-            _isSettingsActive.value = false // إغلاق الإعدادات إن كانت مفتوحة
+            _isSettingsActive.value = false
         }
     }
 
     fun answerQuestion(isCorrect: Boolean) {
-        // تشغيل الصوت والاهتزاز بناءً على الإجابة
         if (isCorrect) {
             _score.value += 10
             soundManager.playCorrectSound()
@@ -65,14 +62,19 @@ class GameViewModel(
             soundManager.playWrongSound()
         }
         
-        // الانتقال للسؤال التالي أو إنهاء اللعبة
         if (_currentQuestionIndex.value < _questions.value.size - 1) {
             _currentQuestionIndex.value += 1
         } else {
             _isGameActive.value = false
             _isGameOver.value = true
-            soundManager.playWinSound() // تشغيل صوت الاحتفال عند ظهور النتيجة
+            soundManager.playWinSound()
         }
+    }
+
+    // الدالة الجديدة لخصم النقاط عند استخدام التلميح
+    fun useHint() {
+        val newScore = _score.value - 5
+        _score.value = if (newScore > 0) newScore else 0
     }
 
     fun returnHome() {
@@ -86,7 +88,6 @@ class GameViewModel(
         if (currentLevelFileName.isNotEmpty()) loadLevel(currentLevelFileName)
     }
 
-    // دوال التحكم بالإعدادات
     fun openSettings() { _isSettingsActive.value = true }
     fun closeSettings() { _isSettingsActive.value = false }
 
