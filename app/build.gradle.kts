@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.gms.google-services") // هذا هو السطر الجديد
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -20,13 +20,25 @@ android {
         }
     }
 
+    // إعدادات التوقيع الرقمي (تسحب الأسرار من GitHub Actions)
+    signingConfigs {
+        create("release") {
+            storeFile = file("arifalkora.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // ربط التوقيع بنسخة الإصدار
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     
@@ -65,6 +77,7 @@ dependencies {
     
     // مكتبة الإشعارات والمهام الخلفية (WorkManager)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    
     // إعدادات Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-analytics")
