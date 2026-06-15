@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. تهيئة إعلانات جوجل (AdMob)
         MobileAds.initialize(this) {}
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -77,10 +76,8 @@ class MainActivity : ComponentActivity() {
                     if (showSplash) {
                         SplashScreen(onSplashFinished = { showSplash = false })
                     } else {
-                        // صندوق يحتوي على الشاشات، وتحته الإعلان
                         Box(modifier = Modifier.fillMaxSize()) {
                             
-                            // محتوى الشاشات (رفعناه للأعلى بمقدار 50dp لكي لا يغطيه الإعلان)
                             Box(modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
                                 when {
                                     isSettingsActive -> {
@@ -103,6 +100,7 @@ class MainActivity : ComponentActivity() {
                                         GameScreen(
                                             question = questions[currentIndex],
                                             onNextQuestion = { isCorrect -> viewModel.answerQuestion(isCorrect) },
+                                            onHintUsed = { viewModel.useHint() }, // تفعيل الخصم هنا
                                             onBackClick = { viewModel.returnHome() }
                                         )
                                     }
@@ -116,7 +114,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            // 2. البانر الإعلاني يظهر دائماً في أسفل الشاشة
                             BannerAd(modifier = Modifier.align(Alignment.BottomCenter))
                         }
                     }
