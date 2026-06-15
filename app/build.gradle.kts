@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services") // هذا هو السطر الجديد
 }
 
 android {
@@ -64,4 +65,10 @@ dependencies {
     
     // مكتبة الإشعارات والمهام الخلفية (WorkManager)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    // إعدادات Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    
+    // إعدادات Google AdMob للإعلانات
+    implementation("com.google.android.gms:play-services-ads:22.6.0")
 }
