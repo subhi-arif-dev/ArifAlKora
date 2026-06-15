@@ -4,7 +4,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
@@ -12,14 +14,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.android.gms.ads.MobileAds
 import com.subhi.arifalkora.data.repository.NotificationWorker
 import com.subhi.arifalkora.data.repository.QuestionRepository
 import com.subhi.arifalkora.data.repository.SettingsManager
 import com.subhi.arifalkora.data.repository.SoundManager
+import com.subhi.arifalkora.ui.components.BannerAd
 import com.subhi.arifalkora.ui.screens.*
 import com.subhi.arifalkora.ui.viewmodel.GameViewModel
 import java.util.concurrent.TimeUnit
@@ -27,6 +33,9 @@ import java.util.concurrent.TimeUnit
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 1. تهيئة إعلانات جوجل (AdMob)
+        MobileAds.initialize(this) {}
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -68,37 +77,47 @@ class MainActivity : ComponentActivity() {
                     if (showSplash) {
                         SplashScreen(onSplashFinished = { showSplash = false })
                     } else {
-                        when {
-                            isSettingsActive -> {
-                                SettingsScreen(
-                                    isSoundEnabled = isSoundEnabled,
-                                    isVibrationEnabled = isVibrationEnabled,
-                                    onSoundToggled = { viewModel.toggleSound(it) },
-                                    onVibrationToggled = { viewModel.toggleVibration(it) },
-                                    onBackClick = { viewModel.closeSettings() }
-                                )
+                        // صندوق يحتوي على الشاشات، وتحته الإعلان
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            
+                            // محتوى الشاشات (رفعناه للأعلى بمقدار 50dp لكي لا يغطيه الإعلان)
+                            Box(modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
+                                when {
+                                    isSettingsActive -> {
+                                        SettingsScreen(
+                                            isSoundEnabled = isSoundEnabled,
+                                            isVibrationEnabled = isVibrationEnabled,
+                                            onSoundToggled = { viewModel.toggleSound(it) },
+                                            onVibrationToggled = { viewModel.toggleVibration(it) },
+                                            onBackClick = { viewModel.closeSettings() }
+                                        )
+                                    }
+                                    isGameOver -> {
+                                        ResultScreen(
+                                            score = score, totalQuestions = questions.size,
+                                            onPlayAgain = { viewModel.replayLevel() },
+                                            onReturnHome = { viewModel.returnHome() }
+                                        )
+                                    }
+                                    isGameActive && questions.isNotEmpty() -> {
+                                        GameScreen(
+                                            question = questions[currentIndex],
+                                            onNextQuestion = { isCorrect -> viewModel.answerQuestion(isCorrect) },
+                                            onBackClick = { viewModel.returnHome() }
+                                        )
+                                    }
+                                    else -> {
+                                        HomeScreen(
+                                            onLevelSelected = { fileName -> viewModel.loadLevel(fileName) },
+                                            onSettingsClick = { viewModel.openSettings() },
+                                            onExitApp = { finish() }
+                                        )
+                                    }
+                                }
                             }
-                            isGameOver -> {
-                                ResultScreen(
-                                    score = score, totalQuestions = questions.size,
-                                    onPlayAgain = { viewModel.replayLevel() },
-                                    onReturnHome = { viewModel.returnHome() }
-                                )
-                            }
-                            isGameActive && questions.isNotEmpty() -> {
-                                GameScreen(
-                                    question = questions[currentIndex],
-                                    onNextQuestion = { isCorrect -> viewModel.answerQuestion(isCorrect) },
-                                    onBackClick = { viewModel.returnHome() }
-                                )
-                            }
-                            else -> {
-                                HomeScreen(
-                                    onLevelSelected = { fileName -> viewModel.loadLevel(fileName) },
-                                    onSettingsClick = { viewModel.openSettings() },
-                                    onExitApp = { finish() } // أمر الخروج النهائي من الأكتيفيتي
-                                )
-                            }
+
+                            // 2. البانر الإعلاني يظهر دائماً في أسفل الشاشة
+                            BannerAd(modifier = Modifier.align(Alignment.BottomCenter))
                         }
                     }
                 }
