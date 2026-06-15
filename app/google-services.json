@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "669608323040",
+    "project_id": "arifalkora-2ed67",
+    "storage_bucket": "arifalkora-2ed67.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669608323040:android:2023686caf29dab456ad85",
+        "android_client_info": {
+          "package_name": "com.subhi.arifalkora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZN7ITzeffyjZGNtKRLFCB6Szjrs1VcCA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
