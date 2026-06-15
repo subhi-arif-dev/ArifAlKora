@@ -17,8 +17,8 @@ fun BannerAd(modifier: Modifier = Modifier) {
         factory = { context ->
             AdView(context).apply {
                 setAdSize(AdSize.BANNER)
-                // هذا هو الرقم التجريبي الرسمي للبانر من جوجل
-                adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                // هذا هو رقم وحدتك الإعلانية الحقيقي للبانر
+                adUnitId = "ca-app-pub-8275739847848743/8161066785"
                 loadAd(AdRequest.Builder().build())
             }
         }
