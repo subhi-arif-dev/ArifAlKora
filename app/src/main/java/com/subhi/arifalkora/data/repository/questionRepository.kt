@@ -2,7 +2,6 @@ package com.subhi.arifalkora.data.repository
 
 import android.content.Context
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.subhi.arifalkora.data.model.Question
 import java.io.InputStreamReader
 
@@ -12,8 +11,11 @@ class QuestionRepository(private val context: Context) {
         return try {
             val inputStream = context.assets.open(fileName)
             val reader = InputStreamReader(inputStream)
-            val listType = object : TypeToken<List<Question>>() {}.type
-            val questions: List<Question> = Gson().fromJson(reader, listType)
+            
+            // الحل السحري لتخطي مشكلة نظام الحماية: استخدام Array بدلاً من TypeToken
+            val questionsArray = Gson().fromJson(reader, Array<Question>::class.java)
+            val questions: List<Question> = questionsArray.toList()
+            
             reader.close()
 
             // 1. اختيار 10 أسئلة عشوائية فقط من الملف!
