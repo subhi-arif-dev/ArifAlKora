@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.subhi.arifalkora">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- طلب صلاحية إرسال الإشعارات -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -13,9 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ArifAlKora">
         
+        <!-- تعريف تطبيق إعلانات AdMob (الرقم الحقيقي الخاص بك) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-8275739847848743~7259048656"/>
 
         <activity
             android:name=".MainActivity"
