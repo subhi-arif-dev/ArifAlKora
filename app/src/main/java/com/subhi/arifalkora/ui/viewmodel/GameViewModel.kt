@@ -92,14 +92,18 @@ class GameViewModel(
         }
     }
 
-    fun answerQuestion(isCorrect: Boolean) {
+    // الدالة الأولى: تعمل فوراً عند الضغط لرفع النقاط وتشغيل الصوت
+    fun processAnswer(isCorrect: Boolean) {
         if (isCorrect) {
             _score.value += 10
             soundManager.playCorrectSound()
         } else {
             soundManager.playWrongSound()
         }
-        
+    }
+
+    // الدالة الثانية: تعمل بعد ثانيتين للانتقال للسؤال التالي
+    fun moveToNextQuestion() {
         if (_currentQuestionIndex.value < _questions.value.size - 1) {
             _currentQuestionIndex.value += 1
         } else {
